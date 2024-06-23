@@ -36,9 +36,7 @@ class kdocker:
             print(f"Pushing Docker image {image_tag} to repository...")
             push_logs = self.client.images.push(image_tag, stream=True, decode=True)
             for log in push_logs:
-                if "status" in log:
-                    print(log["status"])
-                elif "error" in log:
+                if "error" in log:
                     helper.error(f"Error: {log['error']}")
             print(f"Successfully pushed image {image_tag}")
         except docker.errors.APIError as err:
