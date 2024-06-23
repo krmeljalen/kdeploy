@@ -11,7 +11,7 @@ setup(
             "kdeploy = kdeploy.core:run",
         ],
     },
-    install_requires=["docker==7.1.0", "PyYAML==5.4.1"],
+    install_requires=["docker==7.1.0", "PyYAML==5.4.1", "kubernetes==30.1.0"],
     author="Alen Krmelj",
     author_email="krmelj.alen@gmail.com",
     description="A brief description of your package",
