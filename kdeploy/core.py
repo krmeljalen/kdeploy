@@ -18,13 +18,14 @@ def run():
         image_tag = f"{docker_repo}/{app_name}:{app_version}"
 
         # Process docker image
-        kdocker_client = kdocker.kdocker(manifest)
+        kdocker_client = kdocker.kdocker()
         kdocker_client.build_docker_image(image_tag)
         kdocker_client.push_docker_image(image_tag)
 
         # Initiate kubernetes deploy
-        kkubernetes_client = kkubernetes.kkubernetes(manifest)
+        kkubernetes_client = kkubernetes.kkubernetes()
         kkubernetes_client.verify_docker_repo_label(docker_repo_label)
+        kkubernetes_client.deploy(manifest)
 
     # Destroy mode
     if mode == "destroy":

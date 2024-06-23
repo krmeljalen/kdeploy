@@ -5,30 +5,42 @@ import kdeploy.helper as helper
 
 
 class kkubernetes:
-    def __init__(self, manifest):
+    def __init__(self):
         config.load_kube_config()
         self.client = client.CoreV1Api()
 
-    def verify_docker_repo_label(self, label):
-        label_selector = f"label={label}"
+    def verify_docker_repo_label(self, secret_name, namespace="default"):
         try:
-            # List all secrets in all namespaces with the given label selector
-            secrets = self.client.list_secret_for_all_namespaces(
-                label_selector=label_selector
-            )
-
-            # Check if any secrets match the label selector
-            if secrets.items:
-                for secret in secrets.items:
-                    print(
-                        f"Secret Name: {secret.metadata.name}, Namespace: {secret.metadata.namespace} found."
-                    )
-            else:
-                helper.error(
-                    f"No secret found with label '{label_selector}' on kubernetes cluster."
-                )
-
+            # Try to read the secret
+            self.client.read_namespaced_secret(secret_name, namespace)
+            print(f"Kubernetes docker repo secret '{secret_name}' found.")
         except ApiException as e:
-            helper.error(
-                f"Exception when calling CoreV1Api->list_secret_for_all_namespaces: {e}"
-            )
+            if e.status == 404:
+                helper.error(
+                    f"Kubernetes docker repo secret '{secret_name}' does not exist in namespace '{namespace}'."
+                )
+            else:
+                helper.error(f"An error occurred: {e}")
+
+    def deploy_pod(self, manifest):
+        print(f"Deploying Pod {manifest['app_name']}")
+        pass
+
+    def deploy_deployment(self, manifest):
+        print(f"Deploying Deployment {manifest['app_name']}")
+        pass
+
+    def deploy_cronjob(self, manifest):
+        print(f"Deploying Cronjob {manifest['app_name']}")
+        schedule = manifest["kubernetes"]["schedule"]
+        pass
+
+    def deploy(self, manifest):
+        kind = manifest["kubernetes"]["kind"]
+
+        if kind == "Pod":
+            self.deploy_pod(manifest)
+        if kind == "Deployment":
+            self.deploy_deployment(manifest)
+        if kind == "CronJob":
+            self.deploy_cronjob(manifest)

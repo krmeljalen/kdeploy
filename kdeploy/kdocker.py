@@ -4,8 +4,7 @@ import kdeploy.helper as helper
 
 
 class kdocker:
-    def __init__(self, manifest):
-        self.manifest = manifest
+    def __init__(self):
         self.client = docker.from_env()
 
     def build_docker_image(self, image_tag, dockerfile_path="./Dockerfile"):
