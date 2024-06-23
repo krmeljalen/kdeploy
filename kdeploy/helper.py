@@ -20,7 +20,7 @@ def process_manifest():
     # Verify basic keys
     for key in [
         "docker_repo",
-        "docker_secret_label",
+        "docker_repo_label",
         "app_name",
         "app_version",
         "kubernetes",
