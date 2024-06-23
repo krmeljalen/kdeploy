@@ -39,7 +39,7 @@ class kdocker:
                 if "status" in log:
                     print(log["status"])
                 elif "error" in log:
-                    print(f"Error: {log['error']}")
+                    helper.error(f"Error: {log['error']}")
             print(f"Successfully pushed image {image_tag}")
         except docker.errors.APIError as err:
             helper.error(f"Error occurred while pushing image: {err}")
