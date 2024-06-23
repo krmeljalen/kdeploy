@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+
+import kdeploy.core
+
+def main():
+    kdeploy.core.run()
+
+if __name__ == "__main__":
+    main()
