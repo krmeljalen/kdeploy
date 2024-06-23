@@ -1,0 +1,6 @@
+docker_repo: docker.blackbird.si
+docker_secret_label: docker-blackbird-si
+app_name: my_test_app
+app_version: 1.0.0
+kubernetes:
+    kind: Pod
