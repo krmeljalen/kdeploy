@@ -1,4 +1,5 @@
-from kubernetes import client, config
+import yaml
+from kubernetes import client, config, utils
 from kubernetes.client.rest import ApiException
 
 import kdeploy.helper as helper
@@ -10,6 +11,7 @@ class kkubernetes:
         self.client = client.CoreV1Api()
         self.batch_client = client.BatchV1Api()
         self.apps_client = client.AppsV1Api()
+        self.api_client = client.ApiClient()
 
     def verify_docker_repo_label(self, secret_name, namespace="default"):
         try:
@@ -111,8 +113,7 @@ class kkubernetes:
             api_version="apps/v1",
             kind="Deployment",
             metadata=client.V1ObjectMeta(
-                name=app_name,
-                labels={"app.kubernetes.io/name": app_name}
+                name=app_name, labels={"app.kubernetes.io/name": app_name}
             ),
             spec=client.V1DeploymentSpec(
                 replicas=1,
@@ -124,24 +125,24 @@ class kkubernetes:
                         labels={"app.kubernetes.io/name": app_name}
                     ),
                     spec=client.V1PodSpec(
-                        containers=[client.V1Container(
-                            name=app_name,
-                            image=image_tag
-                        )],
-                        image_pull_secrets=[client.V1LocalObjectReference(name=docker_repo_label)]
-                    )
-                )
-            )
+                        containers=[client.V1Container(name=app_name, image=image_tag)],
+                        image_pull_secrets=[
+                            client.V1LocalObjectReference(name=docker_repo_label)
+                        ],
+                    ),
+                ),
+            ),
         )
 
         try:
             # Create the Deployment in the default namespace
-            self.apps_client.create_namespaced_deployment(namespace=namespace, body=deployment_manifest)
+            self.apps_client.create_namespaced_deployment(
+                namespace=namespace, body=deployment_manifest
+            )
         except ApiException as e:
             helper.error(f"Exception when creating Deployment: {e}")
 
         print(f"Deployment '{app_name}' created successfully.")
-
 
     def deploy_service(self, manifest, namespace="default"):
         if "ports" not in manifest["kubernetes"].keys():
@@ -197,6 +198,25 @@ class kkubernetes:
             self.deploy_service(manifest)
             return
 
-    def custom_deploy(self, manifest):
+    def custom_deploy(self, manifest, namespace="default"):
+        app_name = manifest["app_name"]
         kubernetes_path = manifest["kubernetes"]["path"]
-        return
+
+        try:
+            with open(kubernetes_path, "r") as file:
+                pod_spec = yaml.safe_load(file)
+        except:
+            helper.error(f"Could not parse yaml kubernetes file '{kubernetes_path}'")
+
+        try:
+            utils.create_from_yaml(
+                self.api_client, kubernetes_path, namespace=namespace
+            )
+        except:
+            helper.error(
+                f"Failed deploying {app_name} from {kubernetes_path} in namespace {namespace}"
+            )
+
+        print(
+            f"Application '{app_name}' from {kubernetes_path} deployed in namespace {namespace}."
+        )

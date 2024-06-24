@@ -31,6 +31,7 @@ def run():
     # Destroy mode
     if mode == "destroy":
         app_name = manifest["app_name"]
+        # Needs work
 
 
 if __name__ == "__main__":
