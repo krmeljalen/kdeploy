@@ -196,3 +196,7 @@ class kkubernetes:
             self.deploy_deployment(manifest)
             self.deploy_service(manifest)
             return
+
+    def custom_deploy(self, manifest):
+        kubernetes_path = manifest["kubernetes"]["path"]
+        return

@@ -10,7 +10,6 @@ def run():
     # Deploy mode
     if mode == "deploy":
         # Set vars
-        docker_repo_label = manifest["docker_repo_label"]
         image_tag = helper.generate_image_tag(manifest)
 
         # Process docker image
@@ -20,8 +19,14 @@ def run():
 
         # Initiate kubernetes deploy
         kkubernetes_client = kkubernetes.kkubernetes()
-        kkubernetes_client.verify_docker_repo_label(docker_repo_label)
-        kkubernetes_client.deploy(manifest)
+
+        # If we dont have custom kubernetes file, use predefined
+        if "path" not in manifest["kubernetes"].keys():
+            docker_repo_label = manifest["docker_repo_label"]
+            kkubernetes_client.verify_docker_repo_label(docker_repo_label)
+            kkubernetes_client.deploy(manifest)
+        else:
+            kkubernetes_client.custom_deploy(manifest)
 
     # Destroy mode
     if mode == "destroy":

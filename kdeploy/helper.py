@@ -20,12 +20,18 @@ def process_manifest():
     # Verify basic keys
     for key in [
         "docker_repo",
-        "docker_repo_label",
         "app_name",
         "app_version",
         "kubernetes",
     ]:
         if key not in manifest_data.keys():
+            error(f"missing '{key}' in manifest.yaml")
+
+    # If we have custom kubernetes file, end checking here
+    if "path" in manifest_data["kubernetes"].keys():
+        return manifest_data
+    else:
+        if "docker_repo_label" not in manifest_data.keys():
             error(f"missing '{key}' in manifest.yaml")
 
     # Verify mandatory kubernetes needed keys
