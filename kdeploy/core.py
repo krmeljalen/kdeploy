@@ -10,12 +10,8 @@ def run():
     # Deploy mode
     if mode == "deploy":
         # Set vars
-        app_name = manifest["app_name"]
-        app_version = manifest["app_version"]
-        docker_repo = manifest["docker_repo"]
         docker_repo_label = manifest["docker_repo_label"]
-
-        image_tag = f"{docker_repo}/{app_name}:{app_version}"
+        image_tag = helper.generate_image_tag(manifest)
 
         # Process docker image
         kdocker_client = kdocker.kdocker()

@@ -6,4 +6,4 @@ kubernetes:
     kind: Deployment
     replicas: 1
     ports:
-        - 80:80
+        - 80: 80

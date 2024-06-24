@@ -55,3 +55,9 @@ def parse_arguments():
         return "destroy"
     else:
         return "deploy"
+
+def generate_image_tag(manifest):
+    app_name = manifest["app_name"]
+    app_version = manifest["app_version"]
+    docker_repo = manifest["docker_repo"]
+    return f"{docker_repo}/{app_name}:{app_version}"
