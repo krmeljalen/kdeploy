@@ -202,10 +202,9 @@ class kkubernetes:
         app_name = manifest["app_name"]
         kubernetes_path = manifest["kubernetes"]["path"]
 
-        # Verify if it already exists and replace, else normal deploy
         try:
             utils.create_from_yaml(
-                self.api_client, kubernetes_path, namespace=namespace
+                self.api_client, kubernetes_path, verbose=True, namespace=namespace
             )
         except Exception as e:
             helper.error(
