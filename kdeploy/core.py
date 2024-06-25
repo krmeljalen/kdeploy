@@ -30,6 +30,8 @@ def run():
 
     # Destroy mode
     if mode == "destroy":
+        # Initiate kubernetes deploy
+        kkubernetes_client = kkubernetes.kkubernetes()
         kkubernetes_client.delete_deploy(manifest)
 
 
