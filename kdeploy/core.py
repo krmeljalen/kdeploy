@@ -30,8 +30,7 @@ def run():
 
     # Destroy mode
     if mode == "destroy":
-        app_name = manifest["app_name"]
-        # Needs work
+        kkubernetes_client.delete_deploy(manifest)
 
 
 if __name__ == "__main__":

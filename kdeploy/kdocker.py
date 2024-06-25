@@ -8,11 +8,9 @@ class kdocker:
         self.client = docker.from_env()
 
     def build_docker_image(self, image_tag, dockerfile_path="./Dockerfile"):
-        # Ensure the Dockerfile path is valid
         if not os.path.exists(dockerfile_path):
             helper.error(f"Dockerfile path {dockerfile_path} does not exist.")
 
-        # Build the image
         try:
             print("Building Docker image...")
             image, build_logs = self.client.images.build(
@@ -30,7 +28,6 @@ class kdocker:
             helper.error(f"Error occurred with the Docker API: {err}")
 
     def push_docker_image(self, image_tag):
-        # Push the image
         try:
             print(f"Pushing Docker image {image_tag} to repository...")
             push_logs = self.client.images.push(image_tag, stream=True, decode=True)

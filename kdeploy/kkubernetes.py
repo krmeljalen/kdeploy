@@ -214,3 +214,103 @@ class kkubernetes:
         print(
             f"Application '{app_name}' from {kubernetes_path} deployed in namespace {namespace}."
         )
+
+    # Function to check if a service exists
+    def service_exists(self, name, namespace="default"):
+        try:
+            self.client.read_namespaced_service(name=name, namespace=namespace)
+            return True
+        except ApiException as e:
+            if e.status == 404:
+                return False
+            else:
+                raise e
+
+    # Function to check if a deployment exists
+    def deployment_exists(self, name, namespace="default"):
+        try:
+            self.apps_client.read_namespaced_deployment(name=name, namespace=namespace)
+            return True
+        except ApiException as e:
+            if e.status == 404:
+                return False
+            else:
+                raise e
+
+    # Function to check if a pod exists
+    def pod_exists(self, name, namespace="default"):
+        try:
+            self.client.read_namespaced_pod(name=name, namespace=namespace)
+            return True
+        except ApiException as e:
+            if e.status == 404:
+                return False
+            else:
+                raise e
+
+    # Function to check if a cronjob exists
+    def cronjob_exists(self, name, namespace="default"):
+        try:
+            self.batch_client.read_namespaced_cron_job(name=name, namespace=namespace)
+            return True
+        except ApiException as e:
+            if e.status == 404:
+                return False
+            else:
+                raise e
+
+    def delete_deploy(self, manifest, namespace="default"):
+        app_name = manifest["app_name"]
+        kind = manifest["kubernetes"]["kind"]
+
+        print(f"Delete resources for '{app_name}'")
+
+        try:
+            if kind == "CronJob":
+                if self.cronjob_exists(app_name):
+                    self.batch_client.delete_namespaced_cron_job(
+                        name=app_name, namespace=namespace
+                    )
+                    print(f"CronJob '{app_name}' deleted.")
+                else:
+                    print(f"CronJob '{app_name}' not found.")
+                return
+
+            if kind == "Pod":
+                if self.pod_exists(app_name):
+                    self.client.delete_namespaced_pod(
+                        name=app_name, namespace=namespace
+                    )
+                    print(f"Pod '{app_name}' deleted.")
+                else:
+                    print(f"Pod '{app_name}' not found.")
+
+                if self.service_exists(app_name):
+                    self.client.delete_namespaced_service(
+                        name=app_name, namespace=namespace
+                    )
+                    print(f"Service '{app_name}' deleted.")
+                else:
+                    print(f"Service '{app_name}' not found.")
+                return
+
+            if kind == "Deployment":
+                if self.deployment_exists(app_name):
+                    self.apps_client.delete_namespaced_deployment(
+                        name=app_name, namespace=namespace
+                    )
+                    print(f"Deployment '{app_name}' deleted.")
+                else:
+                    print(f"Deployment '{app_name}' not found.")
+
+                if self.service_exists(app_name):
+                    self.client.delete_namespaced_service(
+                        name=app_name, namespace=namespace
+                    )
+                    print(f"Service '{app_name}' deleted.")
+                else:
+                    print(f"Service '{app_name}' not found.")
+                return
+
+        except client.exceptions.ApiException as e:
+            print(f"Exception when deleting: {e}")
