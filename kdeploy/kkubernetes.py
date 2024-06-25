@@ -203,12 +203,6 @@ class kkubernetes:
         kubernetes_path = manifest["kubernetes"]["path"]
 
         try:
-            with open(kubernetes_path, "r") as file:
-                pod_spec = yaml.safe_load(file)
-        except:
-            helper.error(f"Could not parse yaml kubernetes file '{kubernetes_path}'")
-
-        try:
             utils.create_from_yaml(
                 self.api_client, kubernetes_path, namespace=namespace
             )
