@@ -206,9 +206,9 @@ class kkubernetes:
             utils.create_from_yaml(
                 self.api_client, kubernetes_path, namespace=namespace
             )
-        except:
+        except Exception as e:
             helper.error(
-                f"Failed deploying {app_name} from {kubernetes_path} in namespace {namespace}"
+                f"Failed deploying {app_name} from {kubernetes_path} in namespace {namespace} Error: {e}"
             )
 
         print(
