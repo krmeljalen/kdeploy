@@ -32,7 +32,10 @@ def run():
     if mode == "destroy":
         # Initiate kubernetes deploy
         kkubernetes_client = kkubernetes.kkubernetes()
-        kkubernetes_client.delete_deploy(manifest)
+        if "path" not in manifest["kubernetes"].keys():
+            kkubernetes_client.delete_deploy(manifest)
+        else:
+            kkubernetes_client.delete_custom_deploy(manifest)
 
 
 if __name__ == "__main__":

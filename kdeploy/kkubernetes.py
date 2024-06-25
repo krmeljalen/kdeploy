@@ -12,6 +12,7 @@ class kkubernetes:
         self.batch_client = client.BatchV1Api()
         self.apps_client = client.AppsV1Api()
         self.api_client = client.ApiClient()
+        self.network_client = client.NetworkingV1Api()
 
     def verify_docker_repo_label(self, secret_name, namespace="default"):
         try:
@@ -313,4 +314,76 @@ class kkubernetes:
                 return
 
         except client.exceptions.ApiException as e:
-            print(f"Exception when deleting: {e}")
+            helper.error(f"Exception when deleting: {e}")
+
+        print(f"Finished deleting resources for '{app_name}'")
+
+    def delete_custom_resource(self, resource, namespace="default"):
+        kind = resource["kind"]
+        metadata = resource["metadata"]
+        name = metadata["name"]
+        namespace = metadata.get("namespace", "default")
+
+        try:
+            if kind == "Deployment":
+                self.apps_client.delete_namespaced_deployment(
+                    name=name, namespace=namespace
+                )
+            elif kind == "Service":
+                self.client.delete_namespaced_service(name=name, namespace=namespace)
+            elif kind == "Pod":
+                self.client.delete_namespaced_pod(name=name, namespace=namespace)
+            elif kind == "ConfigMap":
+                self.client.delete_namespaced_config_map(name=name, namespace=namespace)
+            elif kind == "Secret":
+                self.client.delete_namespaced_secret(name=name, namespace=namespace)
+            elif kind == "StatefulSet":
+                self.apps_client.delete_namespaced_stateful_set(
+                    name=name, namespace=namespace
+                )
+            elif kind == "DaemonSet":
+                self.apps_client.delete_namespaced_daemon_set(
+                    name=name, namespace=namespace
+                )
+            elif kind == "Job":
+                self.batch_client.delete_namespaced_job(name=name, namespace=namespace)
+            elif kind == "CronJob":
+                self.batch_client.delete_namespaced_cron_job(
+                    name=name, namespace=namespace
+                )
+            elif kind == "Ingress":
+                self.network_client.delete_namespaced_ingress(
+                    name=name, namespace=namespace
+                )
+            elif kind == "PersistentVolumeClaim":
+                self.client.delete_namespaced_persistent_volume_claim(
+                    name=name, namespace=namespace
+                )
+            elif kind == "ReplicaSet":
+                self.apps_client.delete_namespaced_replica_set(
+                    name=name, namespace=namespace
+                )
+            elif kind == "Namespace":
+                self.client.delete_namespace(name=name)
+            else:
+                print(f"Deletion for kind {kind} is not implemented in this script.")
+                return
+
+            print(f"Deleted {kind} '{name}' in namespace '{namespace}'")
+
+        except ApiException as e:
+            helper.error(f"Exception when deleting {kind} '{name}': {e}")
+
+    def delete_custom_deploy(self, manifest):
+        app_name = manifest["app_name"]
+        kubernetes_path = manifest["kubernetes"]["path"]
+
+        print(f"Delete resources for '{app_name}'")
+
+        with open(kubernetes_path, "r") as file:
+            resources = yaml.safe_load_all(file)
+
+            for resource in resources:
+                self.delete_custom_resource(resource)
+
+        print(f"Finished deleting resources for '{app_name}'")
