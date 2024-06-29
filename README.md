@@ -18,7 +18,7 @@ FROM nginx:alpine
 COPY . /usr/share/nginx/html
 ```
 
-index.html
+index.html:
 ```
 Hello world!
 ```
@@ -47,5 +47,44 @@ What you need to do next, once you have `manifest.yaml` in your folder where Doc
 ![Deploy](readme/deploy.png)
 
 # Requirements
+
+1. You need to `docker login` to your docker repository and have access to push images to it
+2. You need to have fully functional kubernetes cluster that you can access via let's say `kubectl`
+
 # Installation
+
+This will install `kdeploy` into your local python libs and allow you to call `kdeploy` in any directory you are in currently.
+```
+git clone git@github.com:krmeljalen/kdeploy.git
+cd kdeploy
+./setup
+./install
+```
+
 # Usage
+
+Copy appropriate `manifest.yaml` from `manifest_examples` folder, trim it to your needs and put it in your application folder where `Dockerfile` lives.
+
+Kdeploy has just one flag:
+
+```
+usage: kdeploy [-h] [-d]
+
+Kdeploy - Kubernetes deploy tool
+
+options:
+  -h, --help  show this help message and exit
+  -d          Destroy app deployment
+```
+
+To deploy app to kubernetes cluster run:
+
+```
+kdeploy
+```
+
+To remove app from kubernetes cluster run:
+
+```
+kdeploy -d
+```
